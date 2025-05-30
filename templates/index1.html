@@ -1,0 +1,373 @@
+ <!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>PONITEM Dashboard</title>
+
+  <!-- Tailwind CSS CDN -->
+  <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet" />
+
+  
+</head>
+<body class="bg-blue-100 p-4 font-sans">
+
+  <!-- Header -->
+<!-- Header -->
+<div class="flex justify-between items-center mb-4 px-4">
+  <!-- Nama Pengguna -->
+  <div class="text-gray-700 text-lg font-semibold">
+    Halo, Admin
+  </div>
+
+  <!-- Logo Tengah -->
+  <img src="/popon.png" alt="popon" class="h-10" />
+
+  <!-- Profil dan Logout -->
+  <div class="relative">
+    <button id="userMenuButton" class="text-2xl focus:outline-none">
+      &#128100;
+    </button>
+    <div id="userMenuDropdown" class="hidden absolute right-0 mt-2 w-32 bg-white border rounded-lg shadow-lg z-50">
+      <a href="index.html" class="block px-4 py-2 text-gray-700 hover:bg-gray-100">
+        Logout
+      </a>
+    </div>
+  </div>
+</div>
+
+
+<!-- Script untuk Toggle Dropdown -->
+<script>
+  const userMenuButton = document.getElementById('userMenuButton');
+  const userMenuDropdown = document.getElementById('userMenuDropdown');
+
+  userMenuButton.addEventListener('click', () => {
+    userMenuDropdown.classList.toggle('hidden');
+  });
+
+  document.addEventListener('click', function (e) {
+    if (!userMenuButton.contains(e.target) && !userMenuDropdown.contains(e.target)) {
+      userMenuDropdown.classList.add('hidden');
+    }
+  });
+</script>
+
+
+
+  <!-- Info Cards -->
+  <div class="grid grid-cols-2 md:grid-cols-3 gap-4 mb-6">
+    <div class="bg-white p-4 rounded-xl shadow text-center">
+      <div class="text-gray-500">Temperature</div>
+      <div class="text-2xl font-bold" id="temperatureValue">30<span class="text-sm">°C</span></div>
+      <div id="temperatureStatus" class="text-sm font-semibold text-gray-500">Loading...</div>
+
+      
+    </div>
+<script>//mengubah keadaanclassName
+ function updateTemperatureStatus(value) {
+      const statusEl = document.getElementById("temperatureStatus");
+  if (value < 24) {
+    statusEl.textContent = "Low";
+    statusEl.className = 'text-sm font-semibold text-blue-500';
+  } else if (value >= 28) {
+    statusEl.textContent = "High";
+    statusEl.className = 'text-sm font-semibold text-red-500';
+  } else {
+    statusEl.textContent = "Normal";
+    statusEl.className = 'text-sm font-semibold text-green-500';
+  }
+} 
+     const suhuSensor = temperatureValue;
+    updateTemperatureStatus(suhuSensor);
+    </script>
+    <div class="bg-white p-4 rounded-xl shadow text-center">
+      <div>pH:</div>
+      <div class="text-2xl font-bold" id="current-ph">7.2</div>
+      <div id="current-ph" class="text-sm font-semibold text-green-500">Normal</div>
+    </div>
+<script>//mengubah keadaanclassName
+ function updatepH(value) {
+      const statusE2 = document.getElementById("phStatus");
+  if (value < 24) {
+    statusE2.textContent = "Low";
+    statusE2.className = 'text-sm font-semibold text-blue-500';
+  } else if (value >= 28) {
+    statusE2.textContent = "High";
+    statusE2.className = 'text-sm font-semibold text-red-500';
+  } else {
+    statusE2.textContent = "Normal";
+    statusE2.className = 'text-sm font-semibold text-green-500';
+  }
+} 
+     const phSensor = phValue;
+    updatepHStatus(phSensor);
+    </script>
+    <div class="bg-white p-4 rounded-xl shadow text-center">
+      <div class="text-gray-500">Turbidity</div>
+      <div class="text-2xl font-bold" id="turbidityValue">15 <span class="text-sm">NTU</span></div>
+      <div id="turbidityStatus" class="text-sm font-semibold text-green-500">Normal</div>
+    </div>
+  </div>
+<script>//mengubah keadaanclassName
+ function updateTurbidityStatus(value) {
+      const statusE3 = document.getElementById("tubidityStatus");
+  if (value < 24) {
+    statusE3.textContent = "Low";
+    statusE3.className = 'text-sm font-semibold text-blue-500';
+  } else if (value >= 28) {
+    statusE3.textContent = "High";
+    statusE3.className = 'text-sm font-semibold text-red-500';
+  } else {
+    statusE3.textContent = "Normal";
+    statusE3.className = 'text-sm font-semibold text-green-500';
+  }
+} 
+     const turbiditySensor = turbidityValue;
+    updateTurbidityStatus(turbiditySensor);
+    </script>
+  <!-- Combined Chart -->
+  <div class="bg-white p-4 rounded-xl shadow mb-6">
+    <div class="flex justify-between items-center mb-2">
+      <h3 class="text-xl font-semibold">Sensor Data</h3>
+      <select id="dataRange" class="border rounded p-1 text-sm">
+        <option value="1h">1 Jam</option>
+        <option value="6h">6 Jam</option>
+        <option value="12h">12 Jam</option>
+        <option value="24h">24 jam</option>
+      </select>
+    </div>
+    <canvas id="allChart"></canvas>
+  </div>
+<div class="chart-container bg-white p-4 rounded-xl shadow mb-6">
+            <h3 class="text-xl font-semibold">Predictive Maintenance Recommendations</h3>
+            <div id="predictions">Loading predictions...</div>
+        </div>
+         <div class="chart-container">
+            <canvas id="phChart"></canvas>
+            <canvas id="turbidityChart" style="margin-top: 20px;"></canvas>
+            <canvas id="temperatureChart" style="margin-top: 20px;"></canvas>
+        </div>
+    </div>
+        <script>
+          const API_URL = 'http://127.0.0.1:5000/api/data';
+        const PREDICTION_API_URL = 'http://127.0.0.1:5000/api/predictive_maintenance';
+let phChart, turbidityChart, temperatureChart;
+async function fetchData() {
+            try {
+                const response = await fetch(API_URL);
+                const data = await response.json();
+                console.log("Fetched data:", data);
+
+                if (data.length > 0) {
+                    const latest = data[0];
+                    document.getElementById('current-ph').textContent = latest.ph ? latest.ph.toFixed(2) : '--';
+                    document.getElementById('current-turbidity').textContent = latest.turbidity ? latest.turbidity.toFixed(2) + ' NTU' : '-- NTU';
+                    document.getElementById('current-temperature').textContent = latest.temperature ? latest.temperature.toFixed(2) + ' °C' : '-- °C';
+
+                    updateCharts(data.reverse()); // Reverse to show oldest first on chart
+                }
+            } catch (error) {
+                console.error("Error fetching sensor data:", error);
+                document.getElementById('current-ph').textContent = 'Error';
+                document.getElementById('current-turbidity').textContent = 'Error';
+                document.getElementById('current-temperature').textContent = 'Error';
+            }
+        }
+
+        async function fetchPredictions() {
+            try {
+                const response = await fetch(PREDICTION_API_URL);
+                const data = await response.json();
+                console.log("Fetched predictions:", data);
+                let predictionHtml = '';
+                if (data.status) {
+                    predictionHtml = `<p>${data.status}</p>`;
+                } else {
+                    for (const key in data) {
+                        predictionHtml += `<p><strong>${key.toUpperCase()}:</strong> ${data[key]}</p>`;
+                    }
+                }
+                document.getElementById('predictions').innerHTML = predictionHtml;
+            } catch (error) {
+                console.error("Error fetching predictions:", error);
+                document.getElementById('predictions').innerHTML = '<p style="color: red;">Error fetching predictions.</p>';
+            }
+        }</script>
+  <!-- Chart.js -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>// Sidebar toggle
+    const menuToggle = document.getElementById('menuToggle');
+    const sidebar = document.getElementById('sidebar');
+    menuToggle.addEventListener('click', () => {
+      sidebar.classList.toggle('hidden');
+    });
+    </script>
+    
+  <script>
+    
+
+    // Chart initialization with 4 datasets
+    const ctx = document.getElementById('allChart').getContext('2d');
+    const allChart = new Chart(ctx, {
+      type: 'line',
+      data: {
+        labels: [],
+        datasets: [
+          {
+            label: 'pH',
+            data: [],
+            borderColor: '#3b82f6',
+            backgroundColor: 'rgba(59,130,246,0.1)',
+            fill: true,
+            tension: 0.4,
+            yAxisID: 'yPh'
+          },
+          {
+            label: 'Temperature (°C)',
+            data: [],
+            borderColor: '#06b6d4',
+            backgroundColor: 'rgba(6,182,212,0.1)',
+            fill: true,
+            tension: 0.4,
+            yAxisID: 'yTemp'
+          },
+          
+          {
+            label: 'Turbidity (NTU)',
+            data: [],
+            borderColor: '#8b5cf6',
+            backgroundColor: 'rgba(139,92,246,0.1)',
+            fill: true,
+            tension: 0.4,
+            yAxisID: 'yTurbidity'
+          }
+        ]
+      },
+      options: {
+        responsive: true,
+        interaction: {
+          mode: 'nearest',
+          intersect: false,
+        },
+        stacked: false,
+        scales: {
+          x: {
+            display: true,
+            title: {
+              display: true,
+              text: 'Time'
+            }
+          },
+          yPh: {
+            type: 'linear',
+            display: true,
+            position: 'left',
+            min: 0,
+            max: 14,
+            title: { display: true, text: 'pH' }
+          },
+          yTemp: {
+            type: 'linear',
+            display: true,
+            position: 'right',
+            min: 0,
+            max: 50,
+            grid: { drawOnChartArea: false },
+            title: { display: true, text: 'Temperature (°C)' }
+          },
+         
+          yTurbidity: {
+            type: 'linear',
+            display: true,
+            position: 'left',
+            min: 0,
+            max: 100,
+            grid: { drawOnChartArea: false },
+            title: { display: true, text: 'Turbidity (NTU)' }
+          }
+        }
+      }
+    });
+
+  </script>
+
+<script>
+
+  function getSampleData(range) {
+    const now = new Date();
+
+    // Helper untuk format waktu HH:MM
+    const formatTime = (date) =>
+      `${String(date.getHours()).padStart(2, '0')}:${String(date.getMinutes()).padStart(2, '0')}`;
+
+    // Generate label dinamis
+    const generateLabels = (intervalMinutes, count) => {
+      return Array.from({ length: count }, (_, i) => {
+        const d = new Date(now.getTime() - (intervalMinutes * (count - 1 - i)) * 60 * 1000);
+        return formatTime(d);
+      });
+    };
+
+    const samples = {
+      '1h': {
+        labels: generateLabels(20, 4), // 4 titik data setiap 20 menit
+        ph: [6.5, 6.8, 7.0, 7.2],
+        temp: [24, 25, 26, 26],
+        turbidity: [10, 13, 14, 15]
+      },
+      '6h': {
+        labels: generateLabels(90, 5), // 5 titik data setiap 1.5 jam
+        ph: [6.4, 6.6, 6.9, 7.1, 7.2],
+        temp: [23, 24, 25, 26, 26],
+        turbidity: [9, 12, 13, 14, 15]
+      },
+      '12h': {
+        labels: generateLabels(120, 6), // 6 titik data setiap 2 jam
+        ph: [6.3, 6.5, 6.8, 7.0, 7.1, 7.2],
+        temp: [22, 23, 24, 25, 26, 26],
+        turbidity: [8, 10, 12, 13, 14, 15]
+      },
+      '24h': {
+        labels: generateLabels(180, 8), // 8 titik data setiap 3 jam
+        ph: [6.2, 6.4, 6.6, 6.8, 7.0, 7.1, 7.2, 7.2],
+        temp: [22, 23, 24, 25, 26, 26, 26, 26],
+        turbidity: [7, 9, 10, 12, 13, 14, 15, 15]
+      }
+    }
+
+    return samples[range] || samples['1h'];
+  }</script>
+  <script>
+    // Update info cards and chart data
+    function updateDashboard(range) {
+      const data = getSampleData(range);
+
+      // Update cards latest values
+      const latestIndex = data.labels.length - 1;
+
+      document.getElementById('phValue').textContent = data.ph[latestIndex].toFixed(2);
+      document.getElementById('temperatureValue').textContent = data.temp[latestIndex].toFixed(1) + ' °C';
+      document.getElementById('turbidityValue').textContent = data.turbidity[latestIndex].toFixed(1) + ' NTU';
+
+     
+      // Update chart
+      allChart.data.labels = data.labels;
+      allChart.data.datasets[0].data = data.ph;
+      allChart.data.datasets[1].data = data.temp;
+      allChart.data.datasets[2].data = data.turbidity;
+      allChart.update();
+    }
+
+    // Range selector event
+    document.getElementById('dataRange').addEventListener('change', (e) => {
+      updateDashboard(e.target.value);
+    });
+
+    // Initial load
+    updateDashboard('10m');
+
+  </script>
+
+</body>
+</html>
